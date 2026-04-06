@@ -67,16 +67,27 @@
   /* Card styles */
   .card {
     @apply bg-dark-surface border border-dark-border rounded-lg p-6;
-    @apply hover:border-accent/30 transition-all duration-300;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(6, 182, 212, 0.35);
+    box-shadow: 0 8px 32px -4px rgba(6, 182, 212, 0.18),
+                0 0 0 1px rgba(6, 182, 212, 0.08);
   }
 
   html.light .card {
     @apply bg-light-surface border-light-border;
-    @apply hover:border-accent/40;
+  }
+
+  html.light .card:hover {
+    box-shadow: 0 8px 28px -4px rgba(6, 182, 212, 0.14),
+                0 0 0 1px rgba(6, 182, 212, 0.12);
   }
 
   html.light header {
-    background-color: rgba(248, 250, 252, 0.8); /* light-bg/80 */
+    background-color: rgba(248, 250, 252, 0.8);
     @apply border-light-border;
   }
 
@@ -101,6 +112,8 @@
     @apply bg-accent text-dark-bg font-medium;
     @apply hover:bg-accent-hover transition-colors;
     @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+    position: relative;
+    overflow: hidden;
   }
 
   .btn-outline {
@@ -108,6 +121,69 @@
     @apply border-2 border-accent text-accent font-medium;
     @apply hover:bg-accent hover:text-dark-bg transition-colors;
     @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Button shimmer */
+  .btn::before,
+  .btn-outline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      105deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.25) 50%,
+      transparent 80%
+    );
+    transform: skewX(-18deg);
+    transition: left 0.45s ease;
+    pointer-events: none;
+  }
+
+  .btn:hover::before,
+  .btn-outline:hover::before {
+    left: 160%;
+  }
+
+  /* Featured card — animated gradient border */
+  .card--featured {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .card--featured::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--grad-angle, 0deg),
+      #06b6d4,
+      #818cf8,
+      #06b6d4,
+      #0891b2,
+      #06b6d4
+    );
+    animation: gradientSpin 5s linear infinite;
+  }
+
+  .card--featured::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    z-index: -1;
+    border-radius: calc(0.5rem - 2px);
+    background: #1e293b;
+  }
+
+  html.light .card--featured::after {
+    background: #ffffff;
   }
 
   /* Prose styles for blog content */
@@ -140,11 +216,11 @@
     @apply hover:text-accent-hover;
   }
 
-  .prose code {
+  .prose :not(pre) > code {
     @apply px-2 py-1 bg-dark-surface rounded text-sm font-mono;
   }
 
-  html.light .prose code {
+  html.light .prose :not(pre) > code {
     @apply bg-light-surface;
   }
 
@@ -152,22 +228,14 @@
     @apply my-6 p-4 bg-dark-bg rounded-lg overflow-x-auto;
   }
 
-  /* Shiki dual-theme: dark mode (default) */
-  .astro-code,
-  .astro-code span {
-    color: var(--shiki-dark) !important;
+  /* Shiki dual-theme: dark mode overrides inline light styles */
+  html.dark .astro-code {
     background-color: var(--shiki-dark-bg) !important;
-    font-style: var(--shiki-dark-font-style) !important;
-    font-weight: var(--shiki-dark-font-weight) !important;
+    color: var(--shiki-dark) !important;
   }
 
-  /* Shiki dual-theme: light mode */
-  html.light .astro-code,
-  html.light .astro-code span {
-    color: var(--shiki-light) !important;
-    background-color: var(--shiki-light-bg) !important;
-    font-style: var(--shiki-light-font-style) !important;
-    font-weight: var(--shiki-light-font-weight) !important;
+  html.dark .astro-code span {
+    color: var(--shiki-dark) !important;
   }
 
   .prose img {
@@ -190,7 +258,78 @@
     @apply bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent;
   }
 
-  .animate-on-scroll {
-    @apply animate-slide-up;
+  /* Scroll reveal */
+  .reveal-hidden {
+    opacity: 0;
+    transform: translateY(22px);
   }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.55s ease-out, transform 0.55s ease-out;
+  }
+
+  /* Hero dot grid */
+  .hero-grid-bg {
+    background-image: radial-gradient(circle, rgba(6, 182, 212, 0.18) 1px, transparent 1px);
+    background-size: 28px 28px;
+    animation: gridFloat 18s ease-in-out infinite alternate;
+  }
+
+  html.light .hero-grid-bg {
+    background-image: radial-gradient(circle, rgba(6, 182, 212, 0.10) 1px, transparent 1px);
+  }
+
+  .bg-radial-fade {
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 50%,
+      transparent 30%,
+      rgba(15, 23, 42, 0.75) 100%
+    );
+  }
+
+  html.light .bg-radial-fade {
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 50%,
+      transparent 30%,
+      rgba(248, 250, 252, 0.75) 100%
+    );
+  }
+
+  /* Typing cursor */
+  .typing-cursor {
+    display: inline-block;
+    color: #06b6d4;
+    font-weight: 300;
+    animation: cursorBlink 1s step-end infinite;
+    margin-left: 1px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typing-cursor { animation: none; opacity: 1; }
+    .hero-grid-bg { animation: none; }
+    .card--featured::before { animation: none; }
+  }
+}
+
+/* Keyframes */
+@keyframes gridFloat {
+  0%   { background-position: 0px 0px; }
+  100% { background-position: 14px 14px; }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes gradientSpin {
+  to { --grad-angle: 360deg; }
+}
+
+@property --grad-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
 }

@@ -1,0 +1,27 @@
+<script>
+  const HIDDEN = 'reveal-hidden';
+  const VISIBLE = 'reveal-visible';
+
+  // Apply hidden state immediately to prevent flash
+  document.querySelectorAll('[data-reveal]').forEach((el) => {
+    el.classList.add(HIDDEN);
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const delay = Number((entry.target as HTMLElement).dataset.revealDelay ?? 0);
+          setTimeout(() => {
+            entry.target.classList.remove(HIDDEN);
+            entry.target.classList.add(VISIBLE);
+          }, delay);
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+  );
+
+  document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
+</script>

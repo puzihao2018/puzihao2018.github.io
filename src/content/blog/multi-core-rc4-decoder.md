@@ -3,7 +3,7 @@ title: "Multi-Core RC4 Decoder/Cracker"
 description: "FPGA-based multi-core RC4 decoder design and implementation using Verilog with parallel processing architecture for efficient cryptanalysis."
 date: 2022-03-18
 tags: ["FPGA", "Verilog", "Cryptography", "Parallel Computing"]
-image: "/images/elec-291-proj2.jpeg"
+# image: "/images/elec-291-proj2.jpeg"
 published: true
 ---
 

@@ -2,7 +2,7 @@
  * Format a date to a readable string
  */
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString('zh-Hans', {
+  return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

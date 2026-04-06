@@ -1,0 +1,196 @@
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-dark-bg text-text-primary;
+    @apply transition-colors duration-300;
+  }
+
+  /* Light mode */
+  html.light body {
+    @apply bg-light-bg text-text-lightPrimary;
+  }
+
+  html.light .text-text-primary {
+    color: #0f172a;
+  }
+
+  html.light .text-text-secondary {
+    color: #475569;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  /* Links */
+  a {
+    @apply text-accent hover:text-accent-hover transition-colors;
+  }
+
+  /* Code */
+  code {
+    @apply font-mono;
+  }
+
+  pre code {
+    @apply text-sm;
+  }
+}
+
+/* Component styles */
+@layer components {
+  /* Card styles */
+  .card {
+    @apply bg-dark-surface border border-dark-border rounded-lg p-6;
+    @apply hover:border-accent/30 transition-all duration-300;
+  }
+
+  html.light .card {
+    @apply bg-light-surface border-light-border;
+    @apply hover:border-accent/40;
+  }
+
+  html.light header {
+    background-color: rgba(248, 250, 252, 0.8); /* light-bg/80 */
+    @apply border-light-border;
+  }
+
+  html.light #mobile-menu {
+    @apply bg-light-surface border-light-border;
+  }
+
+  /* Tag styles */
+  .tag {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm;
+    @apply bg-dark-surface border border-dark-border;
+    @apply text-text-secondary hover:text-accent transition-colors;
+  }
+
+  html.light .tag {
+    @apply bg-light-surface border-light-border text-text-lightSecondary;
+  }
+
+  /* Button styles */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg;
+    @apply bg-accent text-dark-bg font-medium;
+    @apply hover:bg-accent-hover transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg;
+    @apply border-2 border-accent text-accent font-medium;
+    @apply hover:bg-accent hover:text-dark-bg transition-colors;
+    @apply focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+  }
+
+  /* Prose styles for blog content */
+  .prose {
+    @apply max-w-none;
+  }
+
+  .prose h2 {
+    @apply mt-8 mb-4 text-2xl font-semibold;
+  }
+
+  .prose h3 {
+    @apply mt-6 mb-3 text-xl font-semibold;
+  }
+
+  .prose p {
+    @apply my-4 leading-relaxed;
+  }
+
+  .prose ul, .prose ol {
+    @apply my-4 pl-6;
+  }
+
+  .prose li {
+    @apply my-2;
+  }
+
+  .prose a {
+    @apply text-accent underline underline-offset-2;
+    @apply hover:text-accent-hover;
+  }
+
+  .prose code {
+    @apply px-2 py-1 bg-dark-surface rounded text-sm font-mono;
+  }
+
+  html.light .prose code {
+    @apply bg-light-surface;
+  }
+
+  .prose pre {
+    @apply my-6 p-4 bg-dark-bg rounded-lg overflow-x-auto;
+  }
+
+  /* Shiki dual-theme: dark mode (default) */
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+    font-style: var(--shiki-dark-font-style) !important;
+    font-weight: var(--shiki-dark-font-weight) !important;
+  }
+
+  /* Shiki dual-theme: light mode */
+  html.light .astro-code,
+  html.light .astro-code span {
+    color: var(--shiki-light) !important;
+    background-color: var(--shiki-light-bg) !important;
+    font-style: var(--shiki-light-font-style) !important;
+    font-weight: var(--shiki-light-font-weight) !important;
+  }
+
+  .prose img {
+    @apply my-6 rounded-lg;
+  }
+
+  .prose blockquote {
+    @apply my-6 pl-4 border-l-4 border-accent;
+    @apply text-text-secondary italic;
+  }
+
+  html.light .prose blockquote {
+    @apply text-text-lightSecondary;
+  }
+}
+
+/* Utility styles */
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent to-accent-hover bg-clip-text text-transparent;
+  }
+
+  .animate-on-scroll {
+    @apply animate-slide-up;
+  }
+}

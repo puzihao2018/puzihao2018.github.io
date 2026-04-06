@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { sortPostsByDate, calculateReadingTime } from '../utils/helpers';
+import { site } from '../data/site';
+
+// Get latest posts
+const allPosts = await getCollection('blog', ({ data }) => data.published);
+const sortedPosts = sortPostsByDate(allPosts);
+const latestPosts = sortedPosts.slice(0, 3);
+
+// Get featured publication from the collection
+const allPublications = await getCollection('publications');
+const featuredPub = allPublications.find((p) => p.data.featured);
+---
+
+<BaseLayout>
+  <!-- Hero Section -->
+  <Hero />
+
+  <!-- Research Interests -->
+  <section class="max-w-6xl mx-auto px-4 py-16">
+    <h2 class="text-2xl md:text-3xl font-semibold mb-8 text-center">
+      Research Interests
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {site.researchInterests.map((interest) => (
+        <div class="card text-center">
+          <h3 class="text-lg font-semibold text-accent mb-2">
+            {interest.name}
+          </h3>
+          <p class="text-text-secondary text-sm">
+            {interest.desc}
+          </p>
+        </div>
+      ))}
+    </div>
+    <div class="mt-8 text-center">
+      <p class="text-text-secondary max-w-2xl mx-auto">
+        Research focus on hardware-software co-design to accelerate large-scale AI computations
+        and overcome memory bottlenecks in LLMs and data-intensive applications.
+        Member of <a href="https://sailresearch.org" target="_blank" rel="noopener noreferrer" class="text-accent">SAIL Research Group</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- Latest Posts -->
+  <section class="max-w-6xl mx-auto px-4 py-16">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-semibold">
+        Latest Posts
+      </h2>
+      <a href="/blog" class="text-accent hover:text-accent-hover transition-colors text-sm">
+        View All →
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {latestPosts.map((post) => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          slug={post.slug}
+          image={post.data.image}
+          readingTime={calculateReadingTime(post.body)}
+        />
+      ))}
+    </div>
+
+    {latestPosts.length === 0 && (
+      <div class="text-center text-text-secondary py-12">
+        <p>No posts yet. Stay tuned...</p>
+      </div>
+    )}
+  </section>
+
+  <!-- Publication Highlight -->
+  {featuredPub && (
+    <section class="max-w-6xl mx-auto px-4 py-16">
+      <div class="card max-w-2xl mx-auto">
+        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="text-accent">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+          </svg>
+          Featured Publication
+        </h2>
+
+        <p class="text-text-secondary mb-4">
+          <span class="text-text-primary font-medium">{featuredPub.data.authors}</span>,
+          "{featuredPub.data.title},"
+          <span class="italic">{featuredPub.data.venue}</span>{featuredPub.data.location && `, ${featuredPub.data.location}`}, {featuredPub.data.year}{featuredPub.data.pages && `, pp. ${featuredPub.data.pages}`}.
+        </p>
+
+        {featuredPub.data.doi && (
+          <a
+            href={`https://doi.org/${featuredPub.data.doi}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent hover:text-accent-hover text-sm inline-flex items-center gap-1"
+          >
+            DOI: {featuredPub.data.doi}
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </a>
+        )}
+      </div>
+    </section>
+  )}
+</BaseLayout>

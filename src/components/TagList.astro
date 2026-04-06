@@ -1,0 +1,23 @@
+---
+interface Props {
+  tags: string[];
+  class?: string;
+  clickable?: boolean;
+}
+
+const { tags, class: className = '', clickable = false } = Astro.props;
+---
+
+<div class:list={['flex flex-wrap gap-2', className]}>
+  {tags.map((tag) => (
+    clickable ? (
+      <a href={`/blog?tag=${tag}`} class="tag hover:bg-accent/10">
+        {tag}
+      </a>
+    ) : (
+      <span class="tag">
+        {tag}
+      </span>
+    )
+  ))}
+</div>

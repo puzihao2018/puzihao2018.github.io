@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { sortPostsByDate, getUniqueTags, calculateReadingTime } from '../../utils/helpers';
+
+// Get all published posts
+const allPosts = await getCollection('blog', ({ data }) => data.published);
+const sortedPosts = sortPostsByDate(allPosts);
+const allTags = getUniqueTags(sortedPosts);
+
+// Get tag from URL query parameter
+const url = Astro.url;
+const currentTag = url.searchParams.get('tag');
+
+// Filter posts by tag if specified
+const filteredPosts = currentTag 
+  ? sortedPosts.filter((post) => post.data.tags.includes(currentTag))
+  : sortedPosts;
+---
+
+<BaseLayout title={currentTag ? `${currentTag} - Blog` : 'Blog'}>
+  <div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Page Header -->
+    <header class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold mb-4">
+        {currentTag ? `Tag: ${currentTag}` : 'Blog Posts'}
+      </h1>
+      <p class="text-text-secondary">
+        {currentTag 
+          ? `${filteredPosts.length} posts about ${currentTag}`
+          : `${sortedPosts.length} posts in total`
+        }
+      </p>
+    </header>
+    
+    <!-- Tags Filter -->
+    {allTags.length > 0 && (
+      <div class="mb-8 flex flex-wrap gap-2">
+        <a 
+          href="/blog"
+          class={`tag ${!currentTag ? 'bg-accent/20 text-accent' : ''}`}
+        >
+          All
+        </a>
+        {allTags.map((tag) => (
+          <a 
+            href={`/blog?tag=${tag}`}
+            class={`tag ${currentTag === tag ? 'bg-accent/20 text-accent' : ''}`}
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    )}
+    
+    <!-- Posts Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {filteredPosts.map((post) => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          date={post.data.date}
+          tags={post.data.tags}
+          slug={post.slug}
+          image={post.data.image}
+          readingTime={calculateReadingTime(post.body)}
+        />
+      ))}
+    </div>
+    
+    {filteredPosts.length === 0 && (
+      <div class="text-center text-text-secondary py-12">
+        <p>No posts found</p>
+        <a href="/blog" class="text-accent hover:text-accent-hover mt-4 inline-block">
+          View all posts
+        </a>
+      </div>
+    )}
+  </div>
+</BaseLayout>

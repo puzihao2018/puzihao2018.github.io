@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "Bash(yes)",
+      "WebFetch(www.kcl.ac.uk)",
+      "Bash(npm run *)"
+    ]
+  },
+  "$version": 3
+}

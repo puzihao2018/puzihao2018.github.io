@@ -1,0 +1,16 @@
+---
+// Theme toggle script that runs in head to prevent flash
+---
+
+<script is:inline>
+  // This script runs before the page renders to set the correct theme
+  const getThemePreference = () => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      return localStorage.getItem('theme');
+    }
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  };
+  const isDark = getThemePreference() === 'dark';
+  document.documentElement.classList.toggle('dark', isDark);
+  document.documentElement.classList.toggle('light', !isDark);
+</script>

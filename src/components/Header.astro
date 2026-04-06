@@ -1,0 +1,135 @@
+---
+import { site, getSocialUrl } from '../data/site';
+
+const currentPath = Astro.url.pathname;
+const githubUrl = getSocialUrl('github');
+---
+
+<header class="sticky top-0 z-50 bg-dark-bg/80 backdrop-blur-md border-b border-dark-border">
+  <nav class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="/" class="text-xl font-semibold text-text-primary hover:text-accent transition-colors">
+      {site.name}
+    </a>
+
+    <!-- Desktop Navigation -->
+    <div class="hidden md:flex items-center gap-6">
+      {site.nav.map((item) => (
+        <a
+          href={item.href}
+          class={`text-sm transition-colors ${
+            currentPath === item.href
+              ? 'text-accent font-medium'
+              : 'text-text-secondary hover:text-accent'
+          }`}
+        >
+          {item.label}
+        </a>
+      ))}
+
+      <!-- GitHub Link -->
+      {githubUrl && (
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-text-secondary hover:text-accent transition-colors"
+          aria-label="GitHub"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </a>
+      )}
+
+      <!-- Theme Toggle -->
+      <button
+        id="theme-toggle"
+        class="p-2 text-text-secondary hover:text-accent transition-colors rounded-lg"
+        aria-label="Toggle theme"
+      >
+        <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-2.567 1.05-5.086 2.902-6.952A9.718 9.718 0 003 12.25c0 5.385 4.365 9.75 9.75 9.75 3.267 0 6.157-1.61 7.952-4.098z"/>
+        </svg>
+        <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="hidden">
+          <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.06 1.06l1.59 1.591a.75.75 0 001.061-1.06l-1.59-1.591zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button
+      id="mobile-menu-btn"
+      class="md:hidden p-2 text-text-secondary hover:text-accent transition-colors"
+      aria-label="Toggle menu"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="hidden md:hidden bg-dark-surface border-b border-dark-border">
+    <div class="px-4 py-4 flex flex-col gap-4">
+      {site.nav.map((item) => (
+        <a
+          href={item.href}
+          class={`text-sm transition-colors ${
+            currentPath === item.href
+              ? 'text-accent font-medium'
+              : 'text-text-secondary hover:text-accent'
+          }`}
+        >
+          {item.label}
+        </a>
+      ))}
+      {githubUrl && (
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-text-secondary hover:text-accent transition-colors"
+        >
+          GitHub
+        </a>
+      )}
+    </div>
+  </div>
+</header>
+
+<script>
+  // Theme toggle functionality
+  const themeToggle = document.getElementById('theme-toggle');
+  const darkIcon = document.getElementById('theme-icon-dark');
+  const lightIcon = document.getElementById('theme-icon-light');
+
+  const updateIcons = (isDark: boolean) => {
+    if (darkIcon && lightIcon) {
+      darkIcon.classList.toggle('hidden', !isDark);
+      lightIcon.classList.toggle('hidden', isDark);
+    }
+  };
+
+  // Initialize icons based on current theme
+  const currentTheme = document.documentElement.classList.contains('dark');
+  updateIcons(currentTheme);
+
+  themeToggle?.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    document.documentElement.classList.toggle('dark', !isDark);
+    document.documentElement.classList.toggle('light', isDark);
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    updateIcons(!isDark);
+  });
+
+  // Mobile menu toggle
+  const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  mobileMenuBtn?.addEventListener('click', () => {
+    mobileMenu?.classList.toggle('hidden');
+  });
+</script>

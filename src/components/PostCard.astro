@@ -1,0 +1,57 @@
+---
+import TagList from './TagList.astro';
+import { formatDate } from '../utils/helpers';
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  tags?: string[];
+  slug: string;
+  image?: string;
+  readingTime?: number;
+}
+
+const { title, description, date, tags = [], slug, image, readingTime } = Astro.props;
+---
+
+<article class="card group animate-slide-up">
+  <a href={`/blog/${slug}`} class="block">
+    {image && (
+      <div class="aspect-video mb-4 rounded-lg overflow-hidden bg-dark-surface">
+        <img 
+          src={image} 
+          alt={title}
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+        />
+      </div>
+    )}
+    
+    <h2 class="text-xl font-semibold mb-2 group-hover:text-accent transition-colors">
+      {title}
+    </h2>
+    
+    {description && (
+      <p class="text-text-secondary mb-4 line-clamp-2">
+        {description}
+      </p>
+    )}
+    
+    <div class="flex flex-wrap items-center gap-4 text-sm text-text-secondary">
+      <time datetime={date.toISOString()}>
+        {formatDate(date)}
+      </time>
+      
+      {readingTime && (
+        <span>
+          {readingTime} min read
+        </span>
+      )}
+    </div>
+    
+    {tags.length > 0 && (
+      <TagList tags={tags} class="mt-3" />
+    )}
+  </a>
+</article>

@@ -1,0 +1,72 @@
+---
+import { site, getSocialUrl } from '../../data/site';
+
+interface Props {
+  type?: 'website' | 'article' | 'profile';
+  title?: string;
+  description?: string;
+  image?: string;
+  date?: Date;
+  author?: string;
+}
+
+const {
+  type = 'website',
+  title = site.name,
+  description = site.description,
+  image = '/images/profile.jpg',
+  date,
+  author = site.author.name,
+} = Astro.props;
+
+const fullImageUrl = image.startsWith('http') ? image : `${site.url}${image}`;
+
+const githubUrl = getSocialUrl('github');
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": title,
+  "description": description,
+  "url": site.url,
+  "author": {
+    "@type": "Person",
+    "name": site.author.name,
+    "url": site.url
+  }
+};
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": description,
+  "image": fullImageUrl,
+  "author": {
+    "@type": "Person",
+    "name": author
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": site.author.name
+  },
+  ...(date && { "datePublished": date.toISOString() })
+};
+
+const profileSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": site.author.name,
+  "url": site.url,
+  "sameAs": [
+    ...(githubUrl ? [githubUrl] : [])
+  ],
+  "jobTitle": site.author.jobTitle
+};
+
+const schema = type === 'article' ? articleSchema :
+               type === 'profile' ? profileSchema :
+               websiteSchema;
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />

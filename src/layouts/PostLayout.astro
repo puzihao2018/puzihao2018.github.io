@@ -1,0 +1,84 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import TagList from '../components/TagList.astro';
+import { formatDate } from '../utils/helpers';
+import { getSocialUrl } from '../data/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  date: Date;
+  updated?: Date;
+  tags: string[];
+  image?: string;
+  readingTime?: number;
+}
+
+const { title, description, date, updated, tags, image, readingTime } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image}>
+  <article class="max-w-3xl mx-auto px-4 py-12 animate-fade-in">
+    <!-- Post Header -->
+    <header class="mb-8">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">{title}</h1>
+      
+      <div class="flex flex-wrap items-center gap-4 text-text-secondary text-sm">
+        <time datetime={date.toISOString()}>
+          {formatDate(date)}
+        </time>
+        
+        {updated && (
+          <span class="text-text-secondary">
+            (Updated: {formatDate(updated)})
+          </span>
+        )}
+        
+        {readingTime && (
+          <span class="text-text-secondary">
+            {readingTime} min read
+          </span>
+        )}
+      </div>
+      
+      {tags.length > 0 && (
+        <TagList tags={tags} class="mt-4" />
+      )}
+      
+      {image && (
+        <img 
+          src={image} 
+          alt={title}
+          class="mt-6 rounded-lg w-full aspect-video object-cover"
+        />
+      )}
+    </header>
+    
+    <!-- Post Content -->
+    <div class="prose">
+      <slot />
+    </div>
+    
+    <!-- Post Footer -->
+    <footer class="mt-12 pt-8 border-t border-dark-border">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <a href="/blog" class="text-accent hover:text-accent-hover transition-colors">
+          ← Back to Blog
+        </a>
+        
+        <div class="flex items-center gap-4">
+          {getSocialUrl('github') && (
+            <a
+              href={getSocialUrl('github')!}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-text-secondary hover:text-accent transition-colors"
+            >
+              GitHub
+            </a>
+          )}
+        </div>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>

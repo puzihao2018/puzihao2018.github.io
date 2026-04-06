@@ -1,0 +1,44 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import Schema from '../../components/seo/Schema.astro';
+import { calculateReadingTime } from '../../utils/helpers';
+
+// Generate pages for each post
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props as Props;
+const { Content } = await post.render();
+
+// Calculate reading time
+const readingTime = calculateReadingTime(post.body);
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  date={post.data.date}
+  updated={post.data.updated}
+  tags={post.data.tags}
+  image={post.data.image}
+  readingTime={readingTime}
+>
+  <Schema 
+    type="article"
+    title={post.data.title}
+    description={post.data.description}
+    image={post.data.image}
+    date={post.data.date}
+  />
+  <Content />
+</PostLayout>

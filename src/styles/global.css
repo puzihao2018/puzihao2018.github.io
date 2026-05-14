@@ -250,6 +250,61 @@
   html.light .prose blockquote {
     @apply text-text-lightSecondary;
   }
+
+  /* Tables */
+  .prose table {
+    @apply my-6 w-full text-sm;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid theme('colors.dark.border');
+    border-radius: 0.5rem;
+    overflow: hidden;
+    table-layout: auto;
+  }
+
+  html.light .prose table {
+    border-color: theme('colors.light.border');
+  }
+
+  .prose thead {
+    @apply bg-dark-surface;
+  }
+
+  html.light .prose thead {
+    @apply bg-light-surface;
+  }
+
+  .prose th,
+  .prose td {
+    @apply px-4 py-2.5 text-left align-top;
+    border-bottom: 1px solid theme('colors.dark.border');
+  }
+
+  html.light .prose th,
+  html.light .prose td {
+    border-bottom-color: theme('colors.light.border');
+  }
+
+  .prose th {
+    @apply font-semibold text-text-primary;
+  }
+
+  html.light .prose th {
+    color: #0f172a;
+  }
+
+  .prose tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .prose tbody tr:hover {
+    background-color: rgba(6, 182, 212, 0.06);
+  }
+
+  /* KaTeX display math */
+  .prose .katex-display {
+    @apply my-6 overflow-x-auto overflow-y-hidden;
+  }
 }
 
 /* Utility styles */

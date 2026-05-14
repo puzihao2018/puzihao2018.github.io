@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分子动力学 - 邻居列表 (Neighbor List) 可视化</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        canvas {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            width: 45%;
+        }
+        label { margin-bottom: 8px; font-weight: bold; }
+        input[type=range] { width: 100%; }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .stats-table th, .stats-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        .stats-table th { background-color: #e9ecef; }
+        .highlight-bad { color: #d9534f; font-weight: bold; }
+        .highlight-good { color: #5cb85c; font-weight: bold; }
+        .explanation {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align: center; margin-top: 0;">Neighbor List 复杂度优化演示</h2>
+    
+    <canvas id="mdCanvas" width="700" height="400"></canvas>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="nSlider">总原子数 (N): <span id="nVal">200</span></label>
+            <input type="range" id="nSlider" min="20" max="500" value="200">
+        </div>
+        <div class="control-group">
+            <label for="rSlider">截断半径 (Rc): <span id="rVal">100</span></label>
+            <input type="range" id="rSlider" min="30" max="200" value="100">
+        </div>
+    </div>
+
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>总原子数 (N)</th>
+                <th>目标邻居数 (n)</th>
+                <th>O(N²) 传统开销</th>
+                <th>O(N) 优化开销</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="statN">200</td>
+                <td id="statn">0</td>
+                <td id="statBad" class="highlight-bad">0 次计算</td>
+                <td id="statGood" class="highlight-good">0 次计算</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="explanation">
+        <strong>原理说明：</strong> 如果不使用邻居列表，MD 引擎必须计算所有原子对之间的距离（红色数据，呈 N² 爆炸）。使用截断半径后，算法只需在半径内（灰色圆圈）建立受力连接（绿色连线），将极度昂贵的浮点计算量压缩至 N 级别（绿色数据）。这也是为什么优化“内存数据搬运（建表）”比单纯提升算力更重要的原因。
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('mdCanvas');
+    const ctx = canvas.getContext('2d');
+    const nSlider = document.getElementById('nSlider');
+    const rSlider = document.getElementById('rSlider');
+    const nVal = document.getElementById('nVal');
+    const rVal = document.getElementById('rVal');
+    
+    let particles = [];
+    let numParticles = parseInt(nSlider.value);
+    let searchRadius = parseInt(rSlider.value);
+
+    // 初始化粒子
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                isTarget: i === 0 // 第一个粒子作为目标原子
+            });
+        }
+    }
+
+    // 更新和绘制循环
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let targetParticle = particles[0];
+        let neighborCount = 0;
+
+        // 绘制截断半径圈
+        ctx.beginPath();
+        ctx.arc(targetParticle.x, targetParticle.y, searchRadius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.stroke();
+
+        // 物理更新与连线绘制
+        for (let i = 0; i < particles.length; i++) {
+            let p = particles[i];
+
+            // 简单的边界碰撞反弹
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+            // 如果不是目标原子，计算距离并连线
+            if (!p.isTarget) {
+                let dx = p.x - targetParticle.x;
+                let dy = p.y - targetParticle.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= searchRadius) {
+                    neighborCount++;
+                    // 绘制连线
+                    ctx.beginPath();
+                    ctx.moveTo(targetParticle.x, targetParticle.y);
+                    ctx.lineTo(p.x, p.y);
+                    ctx.strokeStyle = 'rgba(92, 184, 92, 0.6)'; // 绿色连线
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // 绘制粒子
+        for (let i = 0; i < particles.length; i++) {
+            let p = particles[i];
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.isTarget ? 6 : 3, 0, Math.PI * 2);
+            ctx.fillStyle = p.isTarget ? '#f0ad4e' : '#5bc0de';
+            ctx.fill();
+        }
+
+        // 更新统计表格
+        updateStats(neighborCount);
+
+        requestAnimationFrame(animate);
+    }
+
+    // 更新UI数据
+    function updateStats(neighborCount) {
+        let n = numParticles;
+        let badComplexity = Math.floor(n * (n - 1) / 2);
+        let goodComplexity = Math.floor(n * neighborCount / 2); // 估算整体
+
+        document.getElementById('statN').innerText = n;
+        document.getElementById('statn').innerText = neighborCount;
+        document.getElementById('statBad').innerText = badComplexity.toLocaleString() + " 次";
+        document.getElementById('statGood').innerText = goodComplexity.toLocaleString() + " 次";
+    }
+
+    // 监听滑块变化
+    nSlider.addEventListener('input', (e) => {
+        numParticles = parseInt(e.target.value);
+        nVal.innerText = numParticles;
+        initParticles(); // 重新初始化
+    });
+
+    rSlider.addEventListener('input', (e) => {
+        searchRadius = parseInt(e.target.value);
+        rVal.innerText = searchRadius;
+    });
+
+    // 启动模拟
+    initParticles();
+    animate();
+</script>
+
+</body>
+</html>

@@ -3,9 +3,8 @@ title: "An Article"
 description: "This is my first test post, used to verify that the blog system is working properly."
 date: 2022-02-13
 tags: ["misc"]
-published: true
+published: false
 ---
-
 This is a test post used to verify that all features of the blog system are working correctly.
 
 ## Article Content

@@ -7,7 +7,7 @@
 
 export const site = {
   name: 'Zihao Pu',
-  url: 'https://puzihao2018.github.io',
+  url: 'https://zihaopu.cn',
   description:
     'PhD Student at King\'s College London - Processing-in-Memory & LLM Acceleration',
   locale: 'zh_CN',
